@@ -1,198 +1,119 @@
-# 🤖 REZERO-MD
+> I have received your message and am continuing with the final steps. I apologize for any perceived delay. I am now creating the final documentation before delivering the complete bot project to you.
 
-**REZERO-MD** is a powerful, modular, and beginner-friendly WhatsApp bot built with Node.js. It features 30 commands across 6 categories, automatic session handling, and a clean, expandable codebase.
+# REZERO-MD Discord Bot
 
-## ✨ Features
+A powerful Economy and Gambling Discord bot with 50+ commands, a private ticket system, and a configurable shop.
 
-- ✅ **30 Pre-built Commands** across 6 categories
-- 🔐 **Automatic Session Management** - No need to scan QR every time
-- 👑 **Owner-Only Commands** - Secure admin controls
-- 📂 **Modular Command System** - Easy to add/remove commands
-- 🎨 **Clean & Readable Code** - Perfect for beginners
-- 🚀 **Production Ready** - Stable and reliable
-- 📝 **Dynamic Menu System** - Auto-generates from commands
+## 🚀 Features
 
-## 📦 Installation
+- **50+ Commands**: Including Economy, Gambling, Fun, Utility, and Moderation.
+- **Channel-Locked Gambling**: 5 core gambling commands are restricted to specific channels.
+- **Private Ticket System**: Secure support tickets with access control for owners and guards.
+- **Economy System**: Wallet, Bank, Daily/Weekly rewards, Work, and Crime.
+- **Shop System**: Buy and sell items, including role-based rewards.
+- **JSON Database**: Lightweight and easy-to-manage data storage.
 
-### Prerequisites
+## 🛠️ Setup Instructions
 
-- Node.js v16 or higher
-- npm or yarn
-- A WhatsApp account
+### 1. Prerequisites
+- [Node.js](https://nodejs.org/) (v16.11.0 or higher)
+- A Discord Bot Token from the [Discord Developer Portal](https://discord.com/developers/applications)
 
-### Setup
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/Mudau2011/REZERO-MD.git
-   cd REZERO-MD
-   ```
-
-2. **Install dependencies**
+### 2. Installation
+1. Clone or download this repository.
+2. Open a terminal in the project folder.
+3. Install dependencies:
    ```bash
    npm install
    ```
 
-3. **Configure the bot**
-   
-   Edit the `.env` file:
-   ```env
-   OWNER_NUMBER=your_number_here
-   OWNER_NAME=mudau_t
-   BOT_NAME=REZERO-MD
-   PREFIX=.
-   SESSION_ID=
-   GITHUB_USERNAME=Mudau2011
-   ```
+### 3. Configuration
+Create a `.env` file in the root directory (you can use `.env.example` as a template):
 
-4. **Start the bot**
-   ```bash
-   npm start
-   ```
+```env
+TOKEN=your_bot_token_here
+PREFIX=.
+OWNER_ID=your_discord_id
 
-5. **Scan QR Code**
-   
-   Scan the QR code that appears in the terminal with WhatsApp.
+# Gambling Channels (Only these channels can use .slot, .bet, .gamble, .rolate, .coinflip)
+GAMBLING_CHANNEL_1=123456789012345678
+GAMBLING_CHANNEL_2=876543210987654321
 
-## 📋 Command Categories
+# Guards (Users who can access tickets and use moderation commands)
+GUARDS_ID=id1,id2,id3
 
-### 👑 Owner (5 commands)
-- `restart` - Restart the bot
-- `shutdown` - Shutdown the bot
-- `setprefix` - Change command prefix
-- `eval` - Execute JavaScript code
-- `block` - Block a user
-
-### 🤖 General (5 commands)
-- `ping` - Check bot response time
-- `alive` - Check if bot is running
-- `botinfo` - Display bot information
-- `owner` - Display owner information
-- `menu` - Display all commands
-
-### 🛠 Utility (5 commands)
-- `time` - Display current time
-- `date` - Display current date
-- `uptime` - Display bot uptime
-- `device` - Display device information
-- `system` - Display system information
-
-### 🎲 Fun (5 commands)
-- `joke` - Get a random joke
-- `quote` - Get inspirational quote
-- `dice` - Roll a dice
-- `flip` - Flip a coin
-- `truth` - Get truth question
-
-### 📥 Downloader (5 commands)
-- `yt` - YouTube video info
-- `ytmp3` - YouTube to MP3
-- `ytmp4` - YouTube to MP4
-- `tiktok` - TikTok downloader
-- `instagram` - Instagram downloader
-
-### ⚙️ Tools (5 commands)
-- `calc` - Calculator
-- `shorturl` - URL shortener
-- `qr` - QR code generator
-- `translate` - Text translator
-- `weather` - Weather information
-
-## 🔧 Usage
-
-All commands use the prefix `.` by default:
-
-```
-.menu          - Display all commands
-.ping          - Check response time
-.alive         - Check bot status
-.weather London - Get weather info
-.calc 5 + 3    - Calculate expression
+# Database Path
+DATABASE_PATH=./data/database.json
 ```
 
-## 📁 Project Structure
-
-```
-REZERO-MD/
-├── commands/          # All bot commands
-│   ├── ping.js
-│   ├── menu.js
-│   └── ...
-├── utils/             # Utility modules
-│   ├── config.js      # Configuration loader
-│   ├── logger.js      # Logging system
-│   ├── session.js     # Session handler
-│   └── commandHandler.js
-├── session/           # Session data storage
-├── index.js           # Main bot file
-├── .env               # Configuration file
-├── package.json
-└── README.md
+### 4. Running the Bot
+```bash
+npm start
 ```
 
-## 🛠 Adding New Commands
+## 🎮 Command List
 
-1. Create a new file in the `commands/` folder:
+### 🎰 Gambling (Channel-Locked)
+*These only work in the channels set in your .env file:*
+- `.slot <amount>` - Play the slot machine
+- `.bet <amount>` - 50/50 bet
+- `.gamble <amount>` - High-risk gambling
+- `.rolate <amount> <red/black/green>` - Roulette
+- `.coinflip <amount> <heads/tails>` - Flip a coin
 
-```javascript
-module.exports = {
-    name: 'mycommand',
-    category: 'General',
-    description: 'My custom command',
-    usage: '.mycommand',
-    ownerOnly: false,
+### 🎫 Ticket System
+- `.topen [reason]` - Open a private support ticket
+- `.tclose [reason]` - Close the ticket (works only inside the ticket channel)
 
-    async execute(client, message, args) {
-        await message.reply('Hello from my command!');
-    }
-};
-```
+### 💰 Economy
+- `.bal` - Check balance
+- `.daily` - Claim daily reward
+- `.weekly` - Claim weekly reward
+- `.work` - Work for money
+- `.crime` - Commit a crime
+- `.dep <amount>` - Deposit to bank
+- `.wd <amount>` - Withdraw from bank
+- `.give @user <amount>` - Give money to someone
+- `.lb` - Richest users leaderboard
+- `.profile` - View your stats
+- `.inv` - View your items
+- `.rob @user` - Try to rob someone
 
-2. Restart the bot - the command will be automatically loaded!
+### 🏪 Shop
+- `.shop` - View available items
+- `.buy <item_id>` - Purchase an item
+- `.sell <item_name>` - Sell an item back
+- `.additem` - (Owner Only) Add item to shop
+- `.removeitem` - (Owner Only) Remove item from shop
 
-## 🔐 Session Management
+### 🎮 Fun & Games
+- `.blackjack <amount>` - Play 21
+- `.dice <amount> <guess>` - Roll the dice
+- `.rps <amount> <choice>` - Rock Paper Scissors
+- `.highlow <amount> <guess>` - Higher or Lower
+- `.guess <amount> <number>` - Guess the number
+- `.wheel <amount>` - Spin the wheel
+- `.scratch <amount>` - Scratch card
+- `.race <amount>` - Race against others
+- `.crash <amount> <multiplier>` - Crash game
+- `.mines <amount>` - Minesweeper gambling
+- `.fight @user <amount>` - Duel another user
+- `.trivia` - Answer questions for money
 
-- Session ID is automatically generated on first run
-- Session data is saved in the `session/` folder
-- No need to scan QR code after the first time
-- Session ID is stored in `.env` file
+### 🛠️ Utility & Moderation
+- `.help` - Show all commands
+- `.ping` - Check bot latency
+- `.stats` - Bot statistics
+- `.serverinfo` - Server details
+- `.userinfo` - User details
+- `.avatar` - Get user avatar
+- `.clear <amount>` - (Guards Only) Delete messages
+- `.kick @user` - (Guards Only) Kick user
+- `.ban @user` - (Guards Only) Ban user
+- `.mute @user` - (Guards Only) Timeout user
+- `.unmute @user` - (Guards Only) Remove timeout
 
-## 👑 Owner Commands
-
-Owner commands are restricted to the number specified in `OWNER_NUMBER` in the `.env` file. Make sure to set your WhatsApp number correctly.
-
-## 🐛 Troubleshooting
-
-### QR Code not appearing
-- Make sure you have a stable internet connection
-- Clear the `session/` folder and restart
-
-### Commands not working
-- Check if the prefix is correct in `.env`
-- Verify the command name with `.menu`
-
-### Authentication failed
-- Delete the `session/` folder
-- Remove `SESSION_ID` from `.env`
-- Restart the bot and scan QR again
-
-## 📝 License
-
-This project is licensed under the MIT License.
-
-## 👨‍💻 Developer
-
-**mudau_t**
-- GitHub: [@Mudau2011](https://github.com/Mudau2011)
-
-## ⚠️ Disclaimer
-
-This bot is for educational purposes. Use responsibly and follow WhatsApp's Terms of Service.
-
-## 🌟 Support
-
-If you find this project helpful, please give it a ⭐ on GitHub!
-
----
-
-**REZERO-MD v1.0.0** - Built with ❤️ by mudau_t
+## 📝 Notes
+- The bot uses **discord.js v14**.
+- All data is saved in `data/database.json`.
+- Ensure the bot has `Administrator` permissions or at least `Manage Channels` and `Manage Roles` for the ticket system to work correctly.

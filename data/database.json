@@ -1,0 +1,22 @@
+{
+  "users": {},
+  "shop": {
+    "vip": {
+      "name": "VIP Role",
+      "price": 10000,
+      "description": "Get the VIP role in the server",
+      "role": null
+    },
+    "premium": {
+      "name": "Premium Package",
+      "price": 25000,
+      "description": "Premium benefits and perks",
+      "role": null
+    }
+  },
+  "lottery": {
+    "pot": 0,
+    "tickets": []
+  },
+  "tickets": {}
+}
