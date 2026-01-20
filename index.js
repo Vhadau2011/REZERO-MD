@@ -9,10 +9,19 @@
 
 const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
+const readline = require('readline');
 const { config, validateConfig } = require('./utils/config');
 const SessionHandler = require('./utils/session');
 const logger = require('./utils/logger');
 const commandHandler = require('./utils/commandHandler');
+
+// Setup readline for interactive input
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+const question = (text) => new Promise((resolve) => rl.question(text, resolve));
 
 // Display banner
 logger.banner();
@@ -166,13 +175,29 @@ process.on('unhandledRejection', (reason, promise) => {
 logger.info('Starting REZERO-MD...');
 client.initialize().then(async () => {
     if (config.bot.usePairingCode && !sessionHandler.sessionExists()) {
-        const pairingNumber = config.bot.pairingNumber;
+        console.log('\n╔════════════════════════════════════════╗');
+        console.log('║       WHATSAPP PAIRING SYSTEM          ║');
+        console.log('╚════════════════════════════════════════╝\n');
+        
+        let pairingNumber = config.bot.pairingNumber;
+        
         if (!pairingNumber) {
-            logger.error('PAIRING_NUMBER is not set in .env file!');
+            pairingNumber = await question('📱 Please enter your phone number (with country code, e.g., 27635666150): ');
+        } else {
+            const useDefault = await question(`📱 Use default number ${pairingNumber}? (y/n): `);
+            if (useDefault.toLowerCase() !== 'y') {
+                pairingNumber = await question('📱 Please enter your phone number: ');
+            }
+        }
+
+        if (!pairingNumber) {
+            logger.error('No phone number provided. Restart the bot to try again.');
             return;
         }
-        
+
+        pairingNumber = pairingNumber.replace(/[^0-9]/g, '');
         logger.info(`Requesting pairing code for: ${pairingNumber}...`);
+        
         try {
             const code = await client.requestPairingCode(pairingNumber);
             console.log('\n╔════════════════════════════════════════╗');
