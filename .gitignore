@@ -8,8 +8,8 @@ session/
 .wwebjs_auth/
 .wwebjs_cache/
 
-# Environment variables
-# .env (Removed from ignore as per user request)
+# # Environment variables
+# .env (Removed from ignore as per user request) (Removed from ignore as per user request)
 
 # Logs
 *.log
