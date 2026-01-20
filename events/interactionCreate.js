@@ -23,7 +23,7 @@ module.exports = {
                 }
 
                 const embed = new EmbedBuilder()
-                    .setColor(0x00aaff)
+                    .setColor(0x2f3136)
                     .setTitle('Select Ticket Category')
                     .setDescription('Please select the category that best describes your issue.');
 
@@ -49,7 +49,7 @@ module.exports = {
             const staffRoleId = process.env.STAFF_ROLE_ID;
             const isStaff = member.roles.cache.has(staffRoleId) || user.id === process.env.OWNER_ID;
 
-            if (['claim_ticket', 'lock_ticket', 'close_ticket', 'save_transcript'].includes(customId)) {
+            if (['claim_ticket', 'lock_ticket', 'close_ticket'].includes(customId)) {
                 if (!isStaff) return interaction.reply({ content: '❌ Only staff members can use these controls!', ephemeral: true });
                 if (!ticket) return interaction.reply({ content: '❌ This channel is not registered as a ticket.', ephemeral: true });
 
@@ -168,7 +168,14 @@ module.exports = {
                     );
 
                 await channel.send({ content: `<@&${process.env.STAFF_ROLE_ID}> a new ticket has been opened!`, embeds: [welcomeEmbed], components: [row] });
-                return interaction.update({ content: `✅ Ticket created: ${channel}`, embeds: [], components: [], ephemeral: true });
+                
+                // If it was from the ephemeral category selector, update it
+                if (interaction.customId === 'select_category') {
+                    return interaction.update({ content: `✅ Ticket created: ${channel}`, embeds: [], components: [], ephemeral: true });
+                } else {
+                    // If it was from the direct menu on the panel, reply ephemerally
+                    return interaction.reply({ content: `✅ Ticket created: ${channel}`, ephemeral: true });
+                }
             }
         }
     }
