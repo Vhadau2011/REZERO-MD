@@ -23,10 +23,24 @@ module.exports = {
                     .setStyle(ButtonStyle.Primary)
             );
 
+        const menuRow = new ActionRowBuilder()
+            .addComponents(
+                new StringSelectMenuBuilder()
+                    .setCustomId('select_category_direct')
+                    .setPlaceholder('Or select a category directly...')
+                    .addOptions([
+                        { label: 'Support', value: 'support', emoji: '🛠️' },
+                        { label: 'Report', value: 'report', emoji: '🚩' },
+                        { label: 'Buy', value: 'buy', emoji: '💰' },
+                        { label: 'Appeal', value: 'appeal', emoji: '⚖️' },
+                        { label: 'Other', value: 'other', emoji: '❓' },
+                    ])
+            );
+
         const channelId = process.env.TICKET_PANEL_CHANNEL_ID || message.channel.id;
         const channel = client.channels.cache.get(channelId) || message.channel;
 
-        await channel.send({ embeds: [embed], components: [row] });
+        await channel.send({ embeds: [embed], components: [row, menuRow] });
         message.reply(`✅ Ticket panel has been sent to <#${channel.id}>`);
     }
 };
