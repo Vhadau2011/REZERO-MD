@@ -25,7 +25,7 @@ module.exports = {
             return message.reply('❌ Please specify a valid amount! Usage: `.give @user <amount>`');
         }
 
-        const user = client.db.getUser(message.author.id);
+        const user = await client.db.getUser(message.author.id);
 
         if (user.economy.wallet < amount) {
             return message.reply(`❌ You don't have enough money! You have **$${formatMoney(user.economy.wallet)}** in your wallet.`);
@@ -34,7 +34,8 @@ module.exports = {
         await client.db.removeMoney(message.author.id, amount);
         await client.db.addMoney(target.id, amount);
 
-        const newBalance = client.db.getUser(message.author.id).wallet;
+        const newUser = await client.db.getUser(message.author.id);
+        const newBalance = newUser.wallet;
 
         const embed = {
             color: 0x00ff00,

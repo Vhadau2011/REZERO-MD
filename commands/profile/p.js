@@ -7,7 +7,7 @@ module.exports = {
     aliases: ['profile'],
     async execute(message, args, client) {
         const target = message.mentions.users.first() || message.author;
-        const userData = client.db.getUser(target.id, target.username);
+        const userData = await client.db.getUser(target.id, target.username);
 
         if (!userData.info.registered) {
             if (target.id === message.author.id) {

@@ -3,7 +3,7 @@ module.exports = {
     category: 'profile',
     description: 'Unban a user\'s Royal Card',
     async execute(message, args, client) {
-        const user = client.db.getUser(message.author.id);
+        const user = await client.db.getUser(message.author.id);
         const isOwner = message.author.id === process.env.OWNER_ID;
         const isMod = user.info.role === 'MOD' || user.info.role === 'OWNER';
 

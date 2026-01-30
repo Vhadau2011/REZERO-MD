@@ -6,7 +6,7 @@ module.exports = {
     description: 'View the richest users',
     aliases: ['lb', 'top', 'rich'],
     async execute(message, args, client) {
-        const leaderboard = client.db.getLeaderboard('wallet', 10);
+        const leaderboard = await client.db.getLeaderboard('wallet', 10);
 
         if (leaderboard.length === 0) {
             return message.reply('❌ No users found in the leaderboard!');

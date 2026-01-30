@@ -13,6 +13,7 @@ module.exports = {
         if (!target) {
             return message.reply('❌ Please mention a user! Usage: `.setrole @user <ROLE>`');
         }
+        const targetData = await client.db.getUser(target.id);
 
         const role = args[1]?.toUpperCase();
         const validRoles = ['OWNER', 'TESTER', 'MOD', 'USER'];

@@ -7,7 +7,7 @@ module.exports = {
     aliases: ['bal', 'money'],
     async execute(message, args, client) {
         const target = message.mentions.users.first() || message.author;
-        const user = client.db.getUser(target.id);
+        const user = await client.db.getUser(target.id);
 
         const total = user.economy.wallet + user.economy.bank;
 

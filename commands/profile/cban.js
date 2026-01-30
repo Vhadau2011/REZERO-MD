@@ -3,7 +3,7 @@ module.exports = {
     category: 'profile',
     description: 'Ban a user\'s Royal Card',
     async execute(message, args, client) {
-        const user = client.db.getUser(message.author.id);
+        const user = await client.db.getUser(message.author.id);
         const isOwner = message.author.id === process.env.OWNER_ID;
         const isMod = user.info.role === 'MOD' || user.info.role === 'OWNER';
 
@@ -16,7 +16,7 @@ module.exports = {
             return message.reply('❌ Please mention a user! Usage: `.cban @user`');
         }
 
-        const targetData = client.db.getUser(target.id);
+        const targetData = await client.db.getUser(target.id);
         if (targetData.info.role === 'OWNER') {
             return message.reply('❌ You cannot ban the Owner!');
         }

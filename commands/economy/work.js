@@ -5,7 +5,7 @@ module.exports = {
     category: 'economy',
     description: 'Work to earn money',
     async execute(message, args, client) {
-        const user = client.db.getUser(message.author.id);
+        const user = await client.db.getUser(message.author.id);
         const cooldown = 60 * 60 * 1000; // 1 hour
         const timeLeft = getCooldownTime(user.economy.lastWork, cooldown);
 
@@ -24,7 +24,8 @@ module.exports = {
         await client.db.addMoney(message.author.id, amount);
         await client.db.updateUser(message.author.id, { lastWork: Date.now() });
 
-        const newBalance = client.db.getUser(message.author.id).wallet;
+        const newUser = await client.db.getUser(message.author.id);
+        const newBalance = newUser.wallet;
 
         const embed = {
             color: 0x00ff00,

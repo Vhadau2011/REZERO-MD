@@ -5,7 +5,7 @@ module.exports = {
     category: 'economy',
     description: 'Claim your daily reward',
     async execute(message, args, client) {
-        const user = client.db.getUser(message.author.id);
+        const user = await client.db.getUser(message.author.id);
         const cooldown = 24 * 60 * 60 * 1000; // 24 hours
         const timeLeft = getCooldownTime(user.economy.lastDaily, cooldown);
 
@@ -17,7 +17,8 @@ module.exports = {
         await client.db.addMoney(message.author.id, amount);
         await client.db.updateUser(message.author.id, { lastDaily: Date.now() });
 
-        const newBalance = client.db.getUser(message.author.id).wallet;
+        const newUser = await client.db.getUser(message.author.id);
+        const newBalance = newUser.wallet;
 
         const embed = {
             color: 0x00ff00,

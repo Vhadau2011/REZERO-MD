@@ -9,7 +9,7 @@ module.exports = {
             return message.reply(`⚠️ Registration is only allowed in <#${regChannelId}>!`);
         }
 
-        const user = client.db.getUser(message.author.id, message.author.username);
+        const user = await client.db.getUser(message.author.id, message.author.username);
         
         if (user.info.registered) {
             return message.reply('✅ You are already registered for a Royal Card!');

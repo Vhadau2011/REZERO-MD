@@ -18,7 +18,7 @@ module.exports = {
             return message.reply('❌ Item not found! Use `.shop` to view available items.');
         }
 
-        const user = client.db.getUser(message.author.id);
+        const user = await client.db.getUser(message.author.id);
 
         if (user.economy.wallet < item.price) {
             return message.reply(`❌ You don't have enough money! You need **$${formatMoney(item.price)}** but you only have **$${formatMoney(user.economy.wallet)}**.`);
@@ -51,7 +51,8 @@ module.exports = {
             }
         }
 
-        const newBalance = client.db.getUser(message.author.id).wallet;
+        const newUser = await client.db.getUser(message.author.id);
+        const newBalance = newUser.wallet;
 
         const embed = {
             color: 0x00ff00,
