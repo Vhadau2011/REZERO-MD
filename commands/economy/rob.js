@@ -64,7 +64,7 @@ module.exports = {
 
             message.reply({ embeds: [embed] });
         } else {
-            const fine = Math.min(user.wallet, getRandomInt(100, 500));
+            const fine = Math.min(user.economy.wallet, getRandomInt(100, 500));
             await client.db.removeMoney(message.author.id, fine);
 
             const newBalance = client.db.getUser(message.author.id).wallet;

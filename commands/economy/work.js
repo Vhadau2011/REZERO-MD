@@ -7,7 +7,7 @@ module.exports = {
     async execute(message, args, client) {
         const user = client.db.getUser(message.author.id);
         const cooldown = 60 * 60 * 1000; // 1 hour
-        const timeLeft = getCooldownTime(user.lastWork, cooldown);
+        const timeLeft = getCooldownTime(user.economy.lastWork, cooldown);
 
         if (timeLeft > 0) {
             return message.reply(`⏰ You're tired! Rest for **${formatTime(timeLeft)}** before working again.`);

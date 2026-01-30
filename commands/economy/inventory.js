@@ -7,11 +7,11 @@ module.exports = {
         const target = message.mentions.users.first() || message.author;
         const user = client.db.getUser(target.id);
 
-        if (user.inventory.length === 0) {
+        if (user.economy.inventory.length === 0) {
             return message.reply(`📦 ${target.username}'s inventory is empty!`);
         }
 
-        const fields = user.inventory.map((item, index) => ({
+        const fields = user.economy.inventory.map((item, index) => ({
             name: `${index + 1}. ${item.name}`,
             value: item.description || 'No description',
             inline: false
@@ -20,7 +20,7 @@ module.exports = {
         const embed = {
             color: 0x00aaff,
             title: `📦 ${target.username}'s Inventory`,
-            description: `Total Items: ${user.inventory.length}`,
+            description: `Total Items: ${user.economy.inventory.length}`,
             fields: fields,
             footer: {
                 text: `${target.tag}`,

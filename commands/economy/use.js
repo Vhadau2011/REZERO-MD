@@ -10,7 +10,7 @@ module.exports = {
         }
 
         const user = client.db.getUser(message.author.id);
-        const item = user.inventory.find(i => i.name.toLowerCase() === itemName.toLowerCase());
+        const item = user.economy.inventory.find(i => i.name.toLowerCase() === itemName.toLowerCase());
 
         if (!item) {
             return message.reply('❌ You don\'t have this item in your inventory!');

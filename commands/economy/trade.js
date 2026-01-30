@@ -20,7 +20,7 @@ module.exports = {
         const user = client.db.getUser(message.author.id);
         const targetUser = client.db.getUser(target.id);
 
-        if (user.inventory.length === 0) {
+        if (user.economy.inventory.length === 0) {
             return message.reply('❌ You don\'t have any items to trade!');
         }
 
@@ -31,7 +31,7 @@ module.exports = {
             fields: [
                 {
                     name: '📦 Your Items',
-                    value: user.inventory.length > 0 ? user.inventory.map(i => i.name).join(', ') : 'None',
+                    value: user.economy.inventory.length > 0 ? user.economy.inventory.map(i => i.name).join(', ') : 'None',
                     inline: false
                 },
                 {

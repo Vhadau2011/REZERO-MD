@@ -8,7 +8,7 @@ module.exports = {
         const ticketPrice = 500;
         const user = client.db.getUser(message.author.id);
 
-        if (user.wallet < ticketPrice) {
+        if (user.economy.wallet < ticketPrice) {
             return message.reply(`❌ You need **$${formatMoney(ticketPrice)}** to buy a lottery ticket!`);
         }
 

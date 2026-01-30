@@ -10,7 +10,7 @@ module.exports = {
         let amount;
 
         if (args[0]?.toLowerCase() === 'all') {
-            amount = user.bank;
+            amount = user.economy.bank;
         } else {
             amount = parseInt(args[0]);
         }
@@ -19,8 +19,8 @@ module.exports = {
             return message.reply('❌ Please specify a valid amount! Usage: `.withdraw <amount>` or `.withdraw all`');
         }
 
-        if (user.bank < amount) {
-            return message.reply(`❌ You don't have enough money in your bank! You have **$${formatMoney(user.bank)}**.`);
+        if (user.economy.bank < amount) {
+            return message.reply(`❌ You don't have enough money in your bank! You have **$${formatMoney(user.economy.bank)}**.`);
         }
 
         await client.db.removeMoney(message.author.id, amount, 'bank');

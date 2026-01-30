@@ -27,8 +27,8 @@ module.exports = {
         const user = client.db.getUser(message.author.id);
         const targetUser = client.db.getUser(target.id);
 
-        if (user.wallet < amount) {
-            return message.reply(`❌ You don't have enough money! You have **$${formatMoney(user.wallet)}** in your wallet.`);
+        if (user.economy.wallet < amount) {
+            return message.reply(`❌ You don't have enough money! You have **$${formatMoney(user.economy.wallet)}** in your wallet.`);
         }
 
         if (targetUser.wallet < amount) {

@@ -7,7 +7,7 @@ module.exports = {
     async execute(message, args, client) {
         const user = client.db.getUser(message.author.id);
         const cooldown = 24 * 60 * 60 * 1000; // 24 hours
-        const timeLeft = getCooldownTime(user.lastDaily, cooldown);
+        const timeLeft = getCooldownTime(user.economy.lastDaily, cooldown);
 
         if (timeLeft > 0) {
             return message.reply(`⏰ You already claimed your daily reward! Come back in **${formatTime(timeLeft)}**.`);

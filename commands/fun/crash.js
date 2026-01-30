@@ -18,8 +18,8 @@ module.exports = {
 
         const user = client.db.getUser(message.author.id);
 
-        if (user.wallet < amount) {
-            return message.reply(`❌ You don't have enough money! You have **$${formatMoney(user.wallet)}** in your wallet.`);
+        if (user.economy.wallet < amount) {
+            return message.reply(`❌ You don't have enough money! You have **$${formatMoney(user.economy.wallet)}** in your wallet.`);
         }
 
         // Generate crash point (weighted towards lower values)

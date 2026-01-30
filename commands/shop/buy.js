@@ -20,12 +20,12 @@ module.exports = {
 
         const user = client.db.getUser(message.author.id);
 
-        if (user.wallet < item.price) {
-            return message.reply(`❌ You don't have enough money! You need **$${formatMoney(item.price)}** but you only have **$${formatMoney(user.wallet)}**.`);
+        if (user.economy.wallet < item.price) {
+            return message.reply(`❌ You don't have enough money! You need **$${formatMoney(item.price)}** but you only have **$${formatMoney(user.economy.wallet)}**.`);
         }
 
         // Check if user already has this item
-        const hasItem = user.inventory.some(i => i.id === itemId);
+        const hasItem = user.economy.inventory.some(i => i.id === itemId);
         if (hasItem) {
             return message.reply('❌ You already own this item!');
         }

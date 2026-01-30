@@ -7,7 +7,7 @@ module.exports = {
     async execute(message, args, client) {
         const user = client.db.getUser(message.author.id);
         const cooldown = 2 * 60 * 60 * 1000; // 2 hours
-        const timeLeft = getCooldownTime(user.lastCrime, cooldown);
+        const timeLeft = getCooldownTime(user.economy.lastCrime, cooldown);
 
         if (timeLeft > 0) {
             return message.reply(`⏰ The cops are watching! Wait **${formatTime(timeLeft)}** before committing another crime.`);
@@ -57,7 +57,7 @@ module.exports = {
             message.reply({ embeds: [embed] });
         } else {
             const fine = getRandomInt(crime.fine[0], crime.fine[1]);
-            const actualFine = Math.min(fine, user.wallet);
+            const actualFine = Math.min(fine, user.economy.wallet);
             await client.db.removeMoney(message.author.id, actualFine);
 
             const newBalance = client.db.getUser(message.author.id).wallet;
