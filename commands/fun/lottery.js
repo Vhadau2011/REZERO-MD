@@ -6,7 +6,7 @@ module.exports = {
     description: 'Buy a lottery ticket',
     async execute(message, args, client) {
         const ticketPrice = 500;
-        const user = client.db.getUser(message.author.id);
+        const user = await client.db.getUser(message.author.id, message.author.username);
 
         if (user.economy.wallet < ticketPrice) {
             return message.reply(`❌ You need **$${formatMoney(ticketPrice)}** to buy a lottery ticket!`);
@@ -19,7 +19,7 @@ module.exports = {
             userId: message.author.id,
             purchasedAt: Date.now()
         });
-        await client.db.save();
+        await client.db.saveGlobal('lottery');
 
         const embed = {
             color: 0x00ff00,
@@ -38,7 +38,7 @@ module.exports = {
                 }
             ],
             footer: {
-                text: `Use ${process.env.PREFIX}lotteryinfo to check details`,
+                text: `Use ${process.env.PREFIX || '.'}lotteryinfo to check details`,
                 icon_url: message.author.displayAvatarURL()
             },
             timestamp: new Date()

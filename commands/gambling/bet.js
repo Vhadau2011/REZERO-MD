@@ -16,7 +16,7 @@ module.exports = {
             return message.reply('❌ Please specify a valid amount! Usage: `.bet <amount>`');
         }
 
-        const user = client.db.getUser(message.author.id);
+        const user = await client.db.getUser(message.author.id, message.author.username);
         
         if (user.economy.wallet < amount) {
             return message.reply(`❌ You don't have enough money! You have **$${formatMoney(user.economy.wallet)}** in your wallet.`);
@@ -27,11 +27,12 @@ module.exports = {
         if (win) {
             await client.db.addMoney(message.author.id, amount);
             await client.db.updateUser(message.author.id, {
-                wins: user.wins + 1,
-                totalGambled: user.totalGambled + amount
+                wins: (user._raw.wins || 0) + 1,
+                totalGambled: (user._raw.totalGambled || 0) + amount
             });
             
-            const newBalance = client.db.getUser(message.author.id).wallet;
+            const updatedUser = await client.db.getUser(message.author.id);
+            const newBalance = updatedUser.economy.wallet;
             
             const embed = {
                 color: 0x00ff00,
@@ -65,11 +66,12 @@ module.exports = {
         } else {
             await client.db.removeMoney(message.author.id, amount);
             await client.db.updateUser(message.author.id, {
-                losses: user.losses + 1,
-                totalGambled: user.totalGambled + amount
+                losses: (user._raw.losses || 0) + 1,
+                totalGambled: (user._raw.totalGambled || 0) + amount
             });
             
-            const newBalance = client.db.getUser(message.author.id).wallet;
+            const updatedUser = await client.db.getUser(message.author.id);
+            const newBalance = updatedUser.economy.wallet;
             
             const embed = {
                 color: 0xff0000,
