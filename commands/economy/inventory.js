@@ -5,7 +5,7 @@ module.exports = {
     aliases: ['inv', 'items'],
     async execute(message, args, client) {
         const target = message.mentions.users.first() || message.author;
-        const user = client.db.getUser(target.id);
+        const user = await client.db.getUser(target.id);
 
         if (user.economy.inventory.length === 0) {
             return message.reply(`📦 ${target.username}'s inventory is empty!`);

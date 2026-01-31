@@ -17,8 +17,8 @@ module.exports = {
             return message.reply('❌ You cannot trade with bots!');
         }
 
-        const user = client.db.getUser(message.author.id);
-        const targetUser = client.db.getUser(target.id);
+        const user = await client.db.getUser(message.author.id);
+        const targetUser = await client.db.getUser(target.id);
 
         if (user.economy.inventory.length === 0) {
             return message.reply('❌ You don\'t have any items to trade!');

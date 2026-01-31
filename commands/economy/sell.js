@@ -11,7 +11,7 @@ module.exports = {
             return message.reply('❌ Please specify an item name! Usage: `.sell <item_name>`');
         }
 
-        const user = client.db.getUser(message.author.id);
+        const user = await client.db.getUser(message.author.id);
         const item = user.economy.inventory.find(i => i.name.toLowerCase() === itemName.toLowerCase());
 
         if (!item) {
@@ -27,7 +27,7 @@ module.exports = {
         await client.db.removeItem(message.author.id, item.name);
         await client.db.addMoney(message.author.id, sellPrice);
 
-        const newBalance = client.db.getUser(message.author.id).wallet;
+        const newBalance = ((await client.db.getUser(message.author.id))).wallet;
 
         const embed = {
             color: 0x00ff00,

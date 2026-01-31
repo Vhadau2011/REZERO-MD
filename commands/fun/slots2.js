@@ -11,7 +11,7 @@ module.exports = {
             return message.reply('❌ Please specify a valid amount! Usage: `.slots2 <amount>`');
         }
 
-        const user = client.db.getUser(message.author.id);
+        const user = await client.db.getUser(message.author.id);
 
         if (user.economy.wallet < amount) {
             return message.reply(`❌ You don't have enough money! You have **$${formatMoney(user.economy.wallet)}** in your wallet.`);
@@ -50,19 +50,19 @@ module.exports = {
             await client.db.addMoney(message.author.id, profit);
             if (multiplier > 1) {
                 await client.db.updateUser(message.author.id, {
-                    wins: user.wins + 1,
-                    totalGambled: user.totalGambled + amount
+                    wins: (user._raw.wins || 0) + 1,
+                    totalGambled: (user._raw.totalGambled || 0) + amount
                 });
             }
         } else {
             await client.db.removeMoney(message.author.id, amount);
             await client.db.updateUser(message.author.id, {
-                losses: user.losses + 1,
-                totalGambled: user.totalGambled + amount
+                losses: (user._raw.losses || 0) + 1,
+                totalGambled: (user._raw.totalGambled || 0) + amount
             });
         }
 
-        const newBalance = client.db.getUser(message.author.id).wallet;
+        const newBalance = ((await client.db.getUser(message.author.id))).wallet;
 
         const embed = {
             color: multiplier > 1 ? 0x00ff00 : multiplier === 1 ? 0xffff00 : 0xff0000,

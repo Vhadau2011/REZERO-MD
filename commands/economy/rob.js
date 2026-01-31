@@ -19,11 +19,11 @@ module.exports = {
             return message.reply('❌ You cannot rob bots!');
         }
 
-        const user = client.db.getUser(message.author.id);
-        const targetUser = client.db.getUser(target.id);
+        const user = await client.db.getUser(message.author.id);
+        const targetUser = await client.db.getUser(target.id);
 
         const cooldown = 60 * 60 * 1000; // 1 hour
-        const timeLeft = getCooldownTime(user.lastRob, cooldown);
+        const timeLeft = getCooldownTime((user._raw.lastRob || 0), cooldown);
 
         if (timeLeft > 0) {
             return message.reply(`⏰ You need to wait **${formatTime(timeLeft)}** before robbing again!`);
@@ -42,7 +42,7 @@ module.exports = {
             await client.db.removeMoney(target.id, amount);
             await client.db.addMoney(message.author.id, amount);
 
-            const newBalance = client.db.getUser(message.author.id).wallet;
+            const newBalance = ((await client.db.getUser(message.author.id))).wallet;
 
             const embed = {
                 color: 0x00ff00,
@@ -67,7 +67,7 @@ module.exports = {
             const fine = Math.min(user.economy.wallet, getRandomInt(100, 500));
             await client.db.removeMoney(message.author.id, fine);
 
-            const newBalance = client.db.getUser(message.author.id).wallet;
+            const newBalance = ((await client.db.getUser(message.author.id))).wallet;
 
             const embed = {
                 color: 0xff0000,

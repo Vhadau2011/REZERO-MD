@@ -9,7 +9,7 @@ module.exports = {
             return message.reply('❌ Please specify an item name! Usage: `.use <item_name>`');
         }
 
-        const user = client.db.getUser(message.author.id);
+        const user = await client.db.getUser(message.author.id);
         const item = user.economy.inventory.find(i => i.name.toLowerCase() === itemName.toLowerCase());
 
         if (!item) {

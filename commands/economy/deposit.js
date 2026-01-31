@@ -6,7 +6,7 @@ module.exports = {
     description: 'Deposit money to your bank',
     aliases: ['dep'],
     async execute(message, args, client) {
-        const user = client.db.getUser(message.author.id);
+        const user = await client.db.getUser(message.author.id);
         let amount;
 
         if (args[0]?.toLowerCase() === 'all') {
@@ -26,7 +26,7 @@ module.exports = {
         await client.db.removeMoney(message.author.id, amount, 'wallet');
         await client.db.addMoney(message.author.id, amount, 'bank');
 
-        const updatedUser = client.db.getUser(message.author.id);
+        const updatedUser = await client.db.getUser(message.author.id);
 
         const embed = {
             color: 0x00ff00,

@@ -5,7 +5,7 @@ module.exports = {
     category: 'economy',
     description: 'Commit a crime (high risk, high reward)',
     async execute(message, args, client) {
-        const user = client.db.getUser(message.author.id);
+        const user = await client.db.getUser(message.author.id);
         const cooldown = 2 * 60 * 60 * 1000; // 2 hours
         const timeLeft = getCooldownTime(user.economy.lastCrime, cooldown);
 
@@ -29,7 +29,7 @@ module.exports = {
             const amount = getRandomInt(crime.reward[0], crime.reward[1]);
             await client.db.addMoney(message.author.id, amount);
 
-            const newBalance = client.db.getUser(message.author.id).wallet;
+            const newBalance = ((await client.db.getUser(message.author.id))).wallet;
 
             const embed = {
                 color: 0x00ff00,
@@ -60,7 +60,7 @@ module.exports = {
             const actualFine = Math.min(fine, user.economy.wallet);
             await client.db.removeMoney(message.author.id, actualFine);
 
-            const newBalance = client.db.getUser(message.author.id).wallet;
+            const newBalance = ((await client.db.getUser(message.author.id))).wallet;
 
             const embed = {
                 color: 0xff0000,

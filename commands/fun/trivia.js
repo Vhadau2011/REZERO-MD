@@ -51,7 +51,7 @@ module.exports = {
             
             if (question.a.includes(answer)) {
                 await client.db.addMoney(message.author.id, question.reward);
-                const newBalance = client.db.getUser(message.author.id).wallet;
+                const newBalance = ((await client.db.getUser(message.author.id))).wallet;
 
                 const successEmbed = {
                     color: 0x00ff00,
