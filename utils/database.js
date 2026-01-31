@@ -4,6 +4,7 @@ const path = require('path');
 class MultiDatabase {
     constructor(baseDir) {
         this.baseDir = baseDir;
+        this.sharedKey = process.env.DATABASE_KEY || 'mudaubotsconnet';
         this.usersDir = path.join(baseDir, 'users');
         this.paths = {
             shop: path.join(baseDir, 'shop.json'),
@@ -19,6 +20,12 @@ class MultiDatabase {
     }
 
     async load() {
+        // Verify shared key
+        if (process.env.DATABASE_KEY && process.env.DATABASE_KEY !== this.sharedKey) {
+            console.error('CRITICAL: Database Key Mismatch! Access Denied.');
+            process.exit(1);
+        }
+
         // Ensure users directory exists
         try {
             await fs.mkdir(this.usersDir, { recursive: true });
