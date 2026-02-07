@@ -101,15 +101,15 @@ module.exports = {
             // Handle Select Menu Interactions
             if (interaction.isStringSelectMenu()) {
                 if (interaction.customId === 'select_category' || interaction.customId === 'select_category_direct') {
-                    // Use deferReply for a fresh response to clear the "thinking" state
                     await interaction.deferReply({ ephemeral: true });
                     
                     const category = interaction.values[0];
                     const { guild, user } = interaction;
 
+                    let channel;
                     try {
-                        // Create Ticket Channel
-                        const channel = await guild.channels.create({
+                        // 1. Create Ticket Channel
+                        channel = await guild.channels.create({
                             name: `ticket-${category}-${user.username}`,
                             type: ChannelType.GuildText,
                             parent: process.env.TICKET_CATEGORY_ID || null,
@@ -120,18 +120,14 @@ module.exports = {
                                 { id: client.user.id, allow: [PermissionFlagsBits.ViewChannel, PermissionFlagsBits.SendMessages, PermissionFlagsBits.ReadMessageHistory] }
                             ]
                         });
+                        console.log(`[Ticket] Channel created: ${channel.id}`);
+                    } catch (err) {
+                        console.error('[Ticket] Error creating channel:', err);
+                        return await interaction.editReply({ content: '❌ Failed to create ticket channel. Please check bot permissions (Manage Channels).' });
+                    }
 
-                        // Save to DB
-                        if (!client.db.data.tickets) client.db.data.tickets = {};
-                        client.db.data.tickets[channel.id] = {
-                            channelId: channel.id,
-                            ownerId: user.id,
-                            category: category,
-                            status: 'open',
-                            createdAt: Date.now()
-                        };
-                        await client.db.save();
-
+                    try {
+                        // 2. Send Welcome Message FIRST (so user sees it immediately)
                         const welcomeEmbed = new EmbedBuilder()
                             .setColor(0x00ff00)
                             .setTitle(`Ticket: ${category.toUpperCase()}`)
@@ -152,22 +148,41 @@ module.exports = {
                             embeds: [welcomeEmbed], 
                             components: [row] 
                         });
-                        
-                        // Finalize the interaction to clear "thinking"
-                        return await interaction.editReply({ content: `✅ Ticket created: ${channel}` });
-                    } catch (error) {
-                        console.error('Error creating ticket channel:', error);
-                        return await interaction.editReply({ content: '❌ Failed to create ticket channel. Please check bot permissions.' });
+                        console.log(`[Ticket] Welcome message sent to: ${channel.id}`);
+                    } catch (err) {
+                        console.error('[Ticket] Error sending welcome message:', err);
+                        // We don't return here because the channel is already created
                     }
+
+                    try {
+                        // 3. Save to DB
+                        if (!client.db.data.tickets) client.db.data.tickets = {};
+                        client.db.data.tickets[channel.id] = {
+                            channelId: channel.id,
+                            ownerId: user.id,
+                            category: category,
+                            status: 'open',
+                            createdAt: Date.now()
+                        };
+                        await client.db.save();
+                        console.log(`[Ticket] Data saved to DB for: ${channel.id}`);
+                    } catch (err) {
+                        console.error('[Ticket] Error saving to DB:', err);
+                    }
+                    
+                    // 4. Finalize the interaction
+                    return await interaction.editReply({ content: `✅ Ticket created: ${channel}` });
                 }
             }
         } catch (error) {
             console.error('Interaction Error:', error);
-            if (!interaction.replied && !interaction.deferred) {
-                await interaction.reply({ content: '❌ An error occurred while processing this interaction.', ephemeral: true }).catch(() => {});
-            } else {
-                await interaction.editReply({ content: '❌ An error occurred while processing this interaction.' }).catch(() => {});
-            }
+            try {
+                if (interaction.deferred || interaction.replied) {
+                    await interaction.editReply({ content: '❌ An error occurred while processing this interaction.' });
+                } else {
+                    await interaction.reply({ content: '❌ An error occurred while processing this interaction.', ephemeral: true });
+                }
+            } catch (e) {}
         }
     }
 };
