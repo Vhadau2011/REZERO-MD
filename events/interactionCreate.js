@@ -9,12 +9,15 @@ module.exports = {
 
             // 1. Open Ticket Button
             if (customId === 'open_ticket') {
+                // Defer reply to prevent "Interaction failed"
+                await interaction.deferReply({ ephemeral: true });
+
                 // Check if user already has an open ticket
                 const existingTicket = Object.values(client.db.data.tickets || {}).find(t => t.ownerId === user.id && t.status === 'open');
                 if (existingTicket) {
                     const ticketChannel = guild.channels.cache.get(existingTicket.channelId);
                     if (ticketChannel) {
-                        return interaction.reply({ content: `❌ You already have an open ticket: ${ticketChannel}`, ephemeral: true });
+                        return interaction.editReply({ content: `❌ You already have an open ticket: ${ticketChannel}` });
                     } else {
                         // Cleanup dead ticket data
                         delete client.db.data.tickets[existingTicket.channelId];
@@ -42,7 +45,7 @@ module.exports = {
                             ])
                     );
 
-                return interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
+                return interaction.editReply({ embeds: [embed], components: [row] });
             }
 
             // 2. Staff Controls
@@ -50,7 +53,7 @@ module.exports = {
             const staffRoleId = process.env.STAFF_ROLE_ID;
             const isStaff = member.roles.cache.has(staffRoleId) || user.id === process.env.OWNER_ID;
 
-            if (['claim_ticket', 'lock_ticket', 'close_ticket'].includes(customId)) {
+            if (['claim_ticket', 'lock_ticket', 'close_ticket', 'save_ticket'].includes(customId)) {
                 if (!isStaff) return interaction.reply({ content: '❌ Only staff members can use these controls!', ephemeral: true });
                 if (!ticket) return interaction.reply({ content: '❌ This channel is not registered as a ticket.', ephemeral: true });
 
@@ -68,25 +71,29 @@ module.exports = {
                     return interaction.reply({ content: `✅ You have claimed this ticket.` });
                 }
 
-                // Lock Ticket
+                // Lock Ticket (Only staff can write)
                 if (customId === 'lock_ticket') {
                     await channel.permissionOverwrites.edit(ticket.ownerId, {
                         SendMessages: false
                     });
-                    return interaction.reply({ content: '🔒 Ticket has been locked. The user can no longer send messages.' });
+                    return interaction.reply({ content: '🔒 Ticket has been locked. Only staff members can now send messages.' });
                 }
 
-                // Close Ticket
-                if (customId === 'close_ticket') {
-                    await interaction.reply({ content: '🧹 Closing ticket and generating transcript...' });
+                // Save Ticket (Generate Transcript and send to log channel)
+                if (customId === 'save_ticket' || customId === 'close_ticket') {
+                    if (customId === 'close_ticket') {
+                        await interaction.reply({ content: '🧹 Closing ticket and saving data...' });
+                    } else {
+                        await interaction.reply({ content: '💾 Saving ticket data to logs...' });
+                    }
                     
                     // Generate Transcript
                     const messages = await channel.messages.fetch({ limit: 100 });
                     let transcriptText = `REZERO-MD TICKET TRANSCRIPT\n`;
                     transcriptText += `Ticket ID: ${channel.id}\n`;
-                    transcriptText += `Owner: ${ticket.ownerId}\n`;
+                    transcriptText += `Owner ID: ${ticket.ownerId}\n`;
                     transcriptText += `Category: ${ticket.category}\n`;
-                    transcriptText += `Closed By: ${user.tag}\n`;
+                    transcriptText += `Saved By: ${user.tag}\n`;
                     transcriptText += `Date: ${new Date().toLocaleString()}\n`;
                     transcriptText += `------------------------------------------\n\n`;
 
@@ -96,27 +103,31 @@ module.exports = {
 
                     const attachment = new AttachmentBuilder(Buffer.from(transcriptText), { name: `transcript-${channel.name}.txt` });
 
-                    // Log to channel
-                    const logChannel = guild.channels.cache.get(process.env.TICKET_LOG_CHANNEL_ID);
+                    // Log to channel (TICKET_LOG_CHANNEL_ID)
+                    const logChannelId = process.env.TICKET_LOG_CHANNEL_ID;
+                    const logChannel = guild.channels.cache.get(logChannelId);
+                    
                     if (logChannel) {
                         const logEmbed = new EmbedBuilder()
-                            .setColor(0xff0000)
-                            .setTitle('📄 Ticket Closed')
+                            .setColor(customId === 'close_ticket' ? 0xff0000 : 0x00ff00)
+                            .setTitle(customId === 'close_ticket' ? '📄 Ticket Closed' : '💾 Ticket Saved')
                             .addFields(
                                 { name: 'Owner', value: `<@${ticket.ownerId}>`, inline: true },
                                 { name: 'Category', value: ticket.category, inline: true },
-                                { name: 'Closed By', value: `<@${user.id}>`, inline: true }
+                                { name: 'Action By', value: `<@${user.id}>`, inline: true }
                             )
                             .setTimestamp();
                         
                         await logChannel.send({ embeds: [logEmbed], files: [attachment] });
                     }
 
-                    setTimeout(async () => {
-                        delete client.db.data.tickets[channel.id];
-                        await client.db.save();
-                        await channel.delete().catch(() => {});
-                    }, 5000);
+                    if (customId === 'close_ticket') {
+                        setTimeout(async () => {
+                            delete client.db.data.tickets[channel.id];
+                            await client.db.save();
+                            await channel.delete().catch(() => {});
+                        }, 5000);
+                    }
                 }
             }
         }
@@ -124,6 +135,9 @@ module.exports = {
         // Handle Select Menu Interactions
         if (interaction.isStringSelectMenu()) {
             if (interaction.customId === 'select_category' || interaction.customId === 'select_category_direct') {
+                // Defer update to prevent "Interaction failed"
+                await interaction.deferReply({ ephemeral: true });
+                
                 const category = interaction.values[0];
                 const { guild, user } = interaction;
 
@@ -154,7 +168,7 @@ module.exports = {
                 const welcomeEmbed = new EmbedBuilder()
                     .setColor(0x00ff00)
                     .setTitle(`Ticket: ${category.toUpperCase()}`)
-                    .setDescription(`Hello <@${user.id}>, welcome to your ticket!\nStaff will be with you shortly. Please explain your issue in detail.`)
+                    .setDescription(`Hello <@${user.id}>, welcome to your ticket!\n\n**Staff will be with you in a short period, please wait.**\n\nPlease explain your issue in detail while you wait.`)
                     .addFields(
                         { name: '👤 Owner', value: `<@${user.id}>`, inline: true },
                         { name: '📂 Category', value: category, inline: true }
@@ -165,18 +179,17 @@ module.exports = {
                     .addComponents(
                         new ButtonBuilder().setCustomId('claim_ticket').setLabel('Claim').setEmoji('🧑‍💼').setStyle(ButtonStyle.Success),
                         new ButtonBuilder().setCustomId('lock_ticket').setLabel('Lock').setEmoji('🔒').setStyle(ButtonStyle.Secondary),
+                        new ButtonBuilder().setCustomId('save_ticket').setLabel('Save').setEmoji('💾').setStyle(ButtonStyle.Primary),
                         new ButtonBuilder().setCustomId('close_ticket').setLabel('Close').setEmoji('🧹').setStyle(ButtonStyle.Danger)
                     );
 
-                await channel.send({ content: `<@&${process.env.STAFF_ROLE_ID}> a new ticket has been opened!`, embeds: [welcomeEmbed], components: [row] });
+                await channel.send({ 
+                    content: `<@&${process.env.STAFF_ROLE_ID}> a new ticket has been opened!`, 
+                    embeds: [welcomeEmbed], 
+                    components: [row] 
+                });
                 
-                // If it was from the ephemeral category selector, update it
-                if (interaction.customId === 'select_category') {
-                    return interaction.update({ content: `✅ Ticket created: ${channel}`, embeds: [], components: [], ephemeral: true });
-                } else {
-                    // If it was from the direct menu on the panel, reply ephemerally
-                    return interaction.reply({ content: `✅ Ticket created: ${channel}`, ephemeral: true });
-                }
+                return interaction.editReply({ content: `✅ Ticket created: ${channel}` });
             }
         }
     }
